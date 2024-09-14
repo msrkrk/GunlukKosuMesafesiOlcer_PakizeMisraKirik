@@ -1,4 +1,6 @@
-﻿namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
+﻿using System.Data;
+
+namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 {
     internal class Program
     {
@@ -12,7 +14,7 @@
             {
                 try
                 {
-                    Console.WriteLine(consoleMsg);
+                    Console.Write($"{consoleMsg}: ");
                     value = Convert.ToInt32(Console.ReadLine());
 
                     if (value < minValue)
@@ -35,6 +37,70 @@
         }
         #endregion
 
+        #region Karşılama Modülü
+
+        static void SayWelcome()
+        {
+            Console.WriteLine("========== GÜNLÜK KOŞU MESAFESİ HESAPLAYICI ==========");
+            Console.WriteLine("Hoşgeldiniz. Bu uygulama girdiğiniz bilgiler doğrultusunda koşu mesafenizi hesaplayacaktır. Keyifli koşular dileriz.");
+
+            Console.WriteLine();
+        }
+
+        static bool AskToStartRunning()
+        {
+            string value = "";
+
+            while (value != "b" && value != "ç")
+            {
+                Console.Write("Koşu başlat:(B) Çıkış:(Ç) ?= ");
+                
+                value = Console.ReadLine().ToLower();
+
+                if (value == "ç")
+                {
+                    Environment.Exit(0);
+                    return false;
+                }
+
+                if (value == "b")
+                    return true;
+                
+                Console.WriteLine("Hatalı giriş.");
+            }
+
+            return false;
+        }
+
+        static string AskToContinueRunning()
+        {
+            string value = "";
+
+            while (value != "b" && value != "h" && value != "ç")
+            {
+                Console.Write("Koşuyu bitir:(B) Hızı Değiştir:(H) Çıkış:(Ç) ?= ");
+
+                value = Console.ReadLine().ToLower();
+
+                if (value == "ç")
+                {
+                    Environment.Exit(0);
+                    break;
+                }
+
+                if (value == "b")
+                    break;
+
+                if (value == "h")
+                    break;
+
+                Console.WriteLine("Hatalı giriş.");
+            }
+
+            return value;
+        }
+        #endregion
+
         #region Veri Giriş Modülü
         // Ortalama bir adımınızın kaç santimetre olduğunu kullanıcıdan input olarak alır.
         // Sonuç int cinsinden santimetre olarak döner.
@@ -43,17 +109,11 @@
             return InputIntegerValue("Bir adımınızın ortalama uzunluğunu giriniz.(cm)", 1);
         }
 
-        // Koşunun kaç bölümden oluşacağını tamsayı olarak alır.
-        static int InputRunningStageCount()
-        {
-            return InputIntegerValue("Koşunuz kaç bölümden oluşmaktadır.", 1);
-        }
-
         // Bir dakikada kaç adım koştuğunu kullıcıdan input olarak alır.
         // Sonuç integer cinsinden adım sayısı döner.
         static int InputStepCountPerMin()
         {
-            return InputIntegerValue("Bir dakikada kaç adım koştuğunuzu giriniz.", 1);
+            return InputIntegerValue("Dakikada kaç adım hızla koşacaksınız?", 1);
         }
 
         // Koşu süresini saat ve dakika cinsinden input olarak kullanıcıdan alır.
@@ -62,11 +122,13 @@
         {
             int totalDuration = 0;
 
+            Console.WriteLine("Ne kadar süredir bu hızla koşuyordunuz?");
+
             while (totalDuration == 0)
             {
-                int hours = InputIntegerValue("Koşu süresi saat giriniz.", 0);
+                int hours = InputIntegerValue("Süre saat", 0);
 
-                int min = InputIntegerValue("Koşu süresi dakika giriniz.", 0);
+                int min = InputIntegerValue("Süre dakika", 0);
 
                 totalDuration = hours * 60 + min;
 
@@ -82,25 +144,46 @@
         // Kullanıcıdan girdileri toplayan metoddur.
         static void InputRunningParams(out int avgStepLength, out int[] stepCountPerMinArr, out int[] runningDurationMinArr)
         {
-            Console.WriteLine("========== GÜNLÜK KOŞU MESAFESİ HESAPLAYICI ==========");
-            Console.WriteLine("Hoşgeldiniz. Bu uygulama girdiğiniz bilgiler doğrultusunda koşu mesafenizi hesaplayacaktır. Keyifli koşular dileriz.");
-
-            Console.WriteLine();
-
             avgStepLength = InputAvgStepLength();
 
-            int runningStageCount = InputRunningStageCount();
+            List<int> stepCountPerMinList = new List<int>();
+            List<int> runningDurationMinList = new List<int>();
 
-            stepCountPerMinArr = new int[runningStageCount];
-            runningDurationMinArr = new int[runningStageCount];
-
-            for (int i = 0; i < runningStageCount; i++)
+            while (true)
             {
+                int stepCountPerMin = InputStepCountPerMin();
+                stepCountPerMinList.Add(stepCountPerMin);
+
                 Console.WriteLine();
-                Console.WriteLine($"==> Koşunun {i + 1}. bölümü için:");
-                stepCountPerMinArr[i] = InputStepCountPerMin();
-                runningDurationMinArr[i] = InputRunningDurationMin();
+                Console.WriteLine($"{stepCountPerMin}adım/dk hızla koşuyorsunuz...");
+                Console.WriteLine();
+
+                string response = AskToContinueRunning();
+
+                int runningDurationMin = InputRunningDurationMin();
+                runningDurationMinList.Add(runningDurationMin);
+
+                if (response == "h")
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Hız parametresi değiştiriliyor...");
+                    Console.WriteLine();
+                    continue;
+                }
+
+                if (response == "b")
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Koşu bitti. Mesafe hesaplanıyor...");
+                    Console.WriteLine();
+                    break;
+                }
+
             }
+
+            stepCountPerMinArr = stepCountPerMinList.ToArray();
+            runningDurationMinArr = runningDurationMinList.ToArray();
+
         }
         #endregion
 
@@ -163,6 +246,8 @@
             Console.WriteLine();
             Console.WriteLine("========== SONUÇ ==========");
             Console.WriteLine($"Girilen değerlere göre hesaplanan günlük koşu mesafeniz: {distance}m");
+            Console.WriteLine();
+            Console.WriteLine();
 
         }
 
@@ -170,11 +255,16 @@
 
         static void Main(string[] args)
         {
-            InputRunningParams(out int avgStepLength, out int[] stepCountPerMinArr, out int[] runningDurationMinArr);
+            SayWelcome();
 
-            CalculateDailyRunningDistance(avgStepLength, stepCountPerMinArr, runningDurationMinArr, out int distance);
+            while (AskToStartRunning())
+            {
+                InputRunningParams(out int avgStepLength, out int[] stepCountPerMinArr, out int[] runningDurationMinArr);
 
-            OutputResult(avgStepLength, stepCountPerMinArr, runningDurationMinArr, distance);
+                CalculateDailyRunningDistance(avgStepLength, stepCountPerMinArr, runningDurationMinArr, out int distance);
+
+                OutputResult(avgStepLength, stepCountPerMinArr, runningDurationMinArr, distance);
+            }
         }
     }
 }
