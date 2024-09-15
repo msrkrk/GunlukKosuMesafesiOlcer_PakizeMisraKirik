@@ -38,7 +38,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
         #endregion
 
         #region Karşılama Modülü
-
+        // Kullanıcıya programı tanıtan alandır.
         static void SayWelcome()
         {
             Console.WriteLine("========== GÜNLÜK KOŞU MESAFESİ HESAPLAYICI ==========");
@@ -46,7 +46,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
             Console.WriteLine();
         }
-
+        // Kullanıcıya başlama ve uygulamadan çıkma talimatı verdiren alandır.
         static bool AskToStartRunning()
         {
             string value = "";
@@ -71,7 +71,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
             return false;
         }
-
+        //Kullanıcıya koşu esnasında hangi değişiklik yapacağını soran alandır.
         static string AskToContinueRunning()
         {
             string value = "";
@@ -120,25 +120,22 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
         // Sonuç integer cinsinden dakika değerini döner.
         static int InputRunningDurationMin()
         {
-            int totalDuration = 0;
-
             Console.WriteLine("Ne kadar süredir bu hızla koşuyordunuz?");
 
-            while (totalDuration == 0)
+            while (true)
             {
                 int hours = InputIntegerValue("Süre saat", 0);
 
-                int min = InputIntegerValue("Süre dakika", 0);
+                int mins = InputIntegerValue("Süre dakika", 0);
 
-                totalDuration = hours * 60 + min;
-
-                if (totalDuration == 0)
+                if (hours == 0 && mins == 0)
                 {
                     Console.WriteLine("Toplam süre 0dk olamaz. Lütfen en az 1dk süre giriniz.");
+                    continue;
                 }
-            }
 
-            return totalDuration;
+                return hours * 60 + mins;
+            }
         }
 
         // Kullanıcıdan girdileri toplayan metoddur.
