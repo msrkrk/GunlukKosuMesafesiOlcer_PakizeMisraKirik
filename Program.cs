@@ -15,6 +15,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
             while (true)
             {
+                //
                 try
                 {
                     Console.Write($"{consoleMsg}: ");
@@ -22,16 +23,30 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
                     if (value < minValue)
                     {
-                        Console.WriteLine($"Lütfen minimum {minValue} değerinden büyük bir değer giriniz.");
-                        Console.WriteLine();
-                        continue;
+                        throw new InvalidOperationException($"Lütfen minimum {minValue} değerinden büyük bir değer giriniz.");
                     }
 
                     break;
                 }
-                catch (Exception)
+                catch (InvalidOperationException e)
                 {
-                    Console.WriteLine("Hatalı giriş yaptınız. Lütfen geçerli bir tamsayı giriniz.");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine();
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Hatalı formatta giriş yaptınız. Lütfen geçerli bir tamsayı giriniz.");
+                    Console.WriteLine();
+                }
+                catch (OverflowException) 
+                {
+                    Console.WriteLine($"Girdiğiniz sayı çok büyük ya da çok küçük. Lütfen {minValue} ile {int.MaxValue} arasında bir tamsayı giriniz.");
+                    Console.WriteLine();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Bilinmeyen bir hata oluştu. Lütfen tekrar deneyin.");
+                    Console.WriteLine(e.Message);
                     Console.WriteLine();
                 }
             }
