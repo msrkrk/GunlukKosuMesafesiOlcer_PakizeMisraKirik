@@ -15,7 +15,6 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
             while (true)
             {
-                //
                 try
                 {
                     Console.Write($"{consoleMsg}: ");
@@ -38,7 +37,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
                     Console.WriteLine("Hatalı formatta giriş yaptınız. Lütfen geçerli bir tamsayı giriniz.");
                     Console.WriteLine();
                 }
-                catch (OverflowException) 
+                catch (OverflowException)
                 {
                     Console.WriteLine($"Girdiğiniz sayı çok büyük ya da çok küçük. Lütfen {minValue} ile {int.MaxValue} arasında bir tamsayı giriniz.");
                     Console.WriteLine();
@@ -72,7 +71,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
             while (value != "b" && value != "ç")
             {
                 Console.Write("Koşu başlat:(B) Çıkış:(Ç) ?= ");
-                
+
                 value = Console.ReadLine().ToLower();
 
                 if (value == "ç")
@@ -83,7 +82,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
                 if (value == "b")
                     return true;
-                
+
                 Console.WriteLine("Hatalı giriş.");
             }
 
