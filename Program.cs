@@ -6,6 +6,9 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
     {
         #region Ortak
         // Kullanıcıdan geçerli bir tam sayı alınmasını sağlar.
+        // Consola parametre olarak verilen consoleMsg mesajını yazar.
+        // Doğru formatta bir tam sayı alınabilmesi için gerekli kontrolleri yapar.
+        // Girilen değerin verilen minValue parametre değerinden büyük girilmesini sağlar.
         static int InputIntegerValue(string consoleMsg, int minValue)
         {
             int value = 0;
@@ -122,32 +125,50 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
         {
             Console.WriteLine("Ne kadar süredir bu hızla koşuyordunuz?");
 
+            // Kullanıcıdan geçerli süre parametrelerinin alındığından emin olana kadar sor.
             while (true)
             {
+                // Bilgileri al.
                 int hours = InputIntegerValue("Süre saat", 0);
-
                 int mins = InputIntegerValue("Süre dakika", 0);
 
+                // Bilgilerin sıfır olup olmadığını kontrol et.
                 if (hours == 0 && mins == 0)
                 {
+                    // Hem saat hem de dakika bilgisi 0 girildi.
+                    // Toplam süre 0 olamaz.
+                    // Kullanıcıya uyarı mesajı göster.
                     Console.WriteLine("Toplam süre 0dk olamaz. Lütfen en az 1dk süre giriniz.");
+
+                    // Döngüyü devam ettir. Saat ve dakika bilgisini tekrar sor.
                     continue;
                 }
 
+                // If koşuluna girmedi.
+                // Toplam süreyi döndür. 
+                // Dögüden çık. Methoddan çık.
                 return hours * 60 + mins;
             }
         }
 
-        // Kullanıcıdan girdileri toplayan metoddur.
+        // Koşu süresince koşu verilerini toplayan method.
+        // Koşunun farklı hızla koşulan bölümlerinin yönetimi ve veri toplaması da burada yapılır.
+        // Methodun çalışma biçimi basitçe, ortalama  adım uzunluğunu tek seferde alır.
+        // Sonra sonsuz bir döngü başlatıp kullanıcı dur diyene kadar yeni koşu hızı ve süresi bilgilerini toplar.
         static void InputRunningParams(out int avgStepLength, out int[] stepCountPerMinArr, out int[] runningDurationMinArr)
         {
             avgStepLength = InputAvgStepLength();
 
+            // Koşu bölümleri için hız ve süre bilgilerini tutan listelerdir.
+            // Listelerin her bir indislerindeki elemanlar,
+            // koşunun o indiste denk gelen bölümünün hız ve süre bilgilerine karşılık gelir.
+            // Koşunun kaç bölümden oluşacağı bilgisi net olmadığı için liste yapısını kullan.
             List<int> stepCountPerMinList = new List<int>();
             List<int> runningDurationMinList = new List<int>();
 
             while (true)
             {
+                // Koşu hızı bilgisini input al ve koşu bölümüne ait parametre listesinin içine at.
                 int stepCountPerMin = InputStepCountPerMin();
                 stepCountPerMinList.Add(stepCountPerMin);
 
@@ -155,11 +176,18 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
                 Console.WriteLine($"{stepCountPerMin}adım/dk hızla koşuyorsunuz...");
                 Console.WriteLine();
 
+                // Kullanıcıya koşuyla ilgili ne yapmak istediğini sor.
                 string response = AskToContinueRunning();
 
+                // Kullanıcı bir komut girdi demektir. 
+                // Hangi komutu girmiş olursa olsun (Koşuyu Bitir ya da Hızı Değiştir) 
+                // bir önceki hız parametresi ile ne kadar süre koştuğu bilgisini al.
                 int runningDurationMin = InputRunningDurationMin();
                 runningDurationMinList.Add(runningDurationMin);
 
+                // Kullanıcı hız değiştirmek istiyor.
+                // Dögünün kalanını yapma başa dön ve yeni bir bölüm oluşması için
+                // kullanıcıya ne hızda koşacağı bilgisini sor. 
                 if (response == "h")
                 {
                     Console.WriteLine();
@@ -168,6 +196,10 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
                     continue;
                 }
 
+                // Kullanıcı koşuyu bitirmek istiyor. 
+                // Döngüyü kır ve programın devam etmesini sağla.
+                // Bu adımdan sonra parametre toplama metodunun işi bitiyor.
+                // Toplanan parametreler out ile dışarıya çıkarılacak.
                 if (response == "b")
                 {
                     Console.WriteLine();
@@ -178,6 +210,7 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
 
             }
 
+            // Metodun out parametre tipleri dizi olduğu için listeleri ToArray kullanarak diziye çevir.
             stepCountPerMinArr = stepCountPerMinList.ToArray();
             runningDurationMinArr = runningDurationMinList.ToArray();
 
@@ -189,14 +222,18 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
         // Girilen adım uzunluğu, koşu hızı ve süre parametreleri kullanarak mesafe hesaplar, metre cinsinden döner.
         static void CalculateDailyRunningDistance(int avgStepLength, int[] stepCountPerMinArr, int[] runningDurationMinArr, out int distance)
         {
-            // stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunluklarının aynı olduklarından eminiz. Hesaplamamız buna göre yapılacaktır. Öyle gelmezse argüman hatası fırlatılır.
+            // stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunluklarının aynı olduklarından eminiz.
+            // Hesaplamamız buna göre yapılacaktır. Öyle gelmezse argüman hatası fırlatılır.
             if (stepCountPerMinArr.Length != runningDurationMinArr.Length)
             {
                 throw new ArgumentException("stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunlukları aynı olmalıdır.");
             };
 
+            // ilk değer ata.
+            // parametre başka bir ilk değer ile gönderilse bile sıfırlayıp hesapla.
             distance = 0;
 
+            // Her bir koşu bölümündeki hız ve süre parametrelerini kullanarak mesafeyi hesapla.
             for (int i = 0; i < stepCountPerMinArr.Length; i++)
             {
                 int stepCountPerMin = stepCountPerMinArr[i];
@@ -222,7 +259,8 @@ namespace GunlukKosuMesafesiOlcer_PakizeMisraKirik
         //Kullanıcı girdilerini ve hesaplanan mesafeyi ekrana yazdırır.
         static void OutputResult(int avgStepLength, int[] stepCountPerMinArr, int[] runningDurationMinArr, int distance)
         {
-            // stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunluklarının aynı olduklarından eminiz. Hesaplamamız buna göre yapılacaktır. Öyle gelmezse argüman hatası fırlatılır.
+            // stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunluklarının aynı olduklarından eminiz.
+            // Hesaplamamız buna göre yapılacaktır. Öyle gelmezse argüman hatası fırlatılır.
             if (stepCountPerMinArr.Length != runningDurationMinArr.Length)
             {
                 throw new ArgumentException("stepCountPerMinArr ve runningDurationMinArr dizilerinin uzunlukları aynı olmalıdır.");
